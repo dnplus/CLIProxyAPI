@@ -188,7 +188,7 @@ func (e *Engine) Project(k Key, now time.Time) Projection {
 	for _, r := range e.State.Reservations {
 		for _, w := range r.Windows {
 			cycleStart := o.ResetAt.Add(-time.Duration(p.DurationSeconds * float64(time.Second)))
-			renewed := p.DurationSeconds > 0 && !cycleStart.Before(w.At) && o.At.After(w.At)
+			renewed := p.DurationSeconds > 0 && cycleStart.After(w.At) && o.At.After(w.At)
 			if w.Key == k && !renewed {
 				p.RemainingPercent -= *w.UsedPercent
 			}

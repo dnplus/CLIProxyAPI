@@ -362,3 +362,29 @@ func TestQuotaAndResetChangeRanking(t *testing.T) {
 		t.Fatalf("did not prefer expiring equal-cost surplus: %+v", d)
 	}
 }
+
+func TestReservationAtCycleStartRemainsCharged(t *testing.T) {
+	s := fixture(t)
+	e := engine(t, s)
+	n := s.Events[0].At
+	task := *s.Events[0].Task
+	for i := range e.State.Observations {
+		o := &e.State.Observations[i]
+		o.DurationSeconds = o.ResetAt.Sub(n).Seconds()
+		o.DurationSource = "provider"
+	}
+	d := e.Decide(task, n, "adaptive", nil)
+	if err := e.Reserve(task, d); err != nil {
+		t.Fatal(err)
+	}
+	k := s.Config.Routes[1].Windows[0]
+	p := e.Project(k, n)
+	used := 12.0
+	o := Observation{Key: k, At: n.Add(time.Second), ResetAt: p.ResetAt, UsedPercent: &used, DurationSeconds: 18000, DurationSource: "provider", Source: "fixture", IdentityEvidence: "account-bound"}
+	if err := e.Observe(o); err != nil {
+		t.Fatal(err)
+	}
+	if p = e.Project(k, o.At); p.RemainingPercent > 83 {
+		t.Fatalf("same-cycle reservation released: %+v", p)
+	}
+}
