@@ -268,3 +268,97 @@ func TestTokenBarDoesNotBecomeAccountQuota(t *testing.T) {
 		t.Fatalf("%+v", rows)
 	}
 }
+
+func TestResetJitterCannotReleaseReservations(t *testing.T) {
+	s := fixture(t)
+	e := engine(t, s)
+	task := *s.Events[0].Task
+	n := s.Events[0].At
+	d := e.Decide(task, n, "adaptive", nil)
+	if err := e.Reserve(task, d); err != nil {
+		t.Fatal(err)
+	}
+	k := s.Config.Routes[1].Windows[0]
+	p := e.Project(k, n)
+	used := 12.0
+	o := Observation{Key: k, At: n.Add(time.Second), UsedPercent: &used, ResetAt: p.ResetAt.Add(time.Second), Source: "fixture", IdentityEvidence: "account-bound"}
+	if err := e.Observe(o); err != nil {
+		t.Fatal(err)
+	}
+	if got := e.Project(k, o.At).RemainingPercent; got != 83 {
+		t.Fatalf("jitter released reservation: %v", got)
+	}
+	o.At = p.ResetAt.Add(2 * time.Second)
+	o.ResetAt = o.At.Add(5 * time.Hour)
+	o.DurationSeconds = 18000
+	o.DurationSource = "provider"
+	used = 0
+	o.UsedPercent = &used
+	if err := e.Observe(o); err != nil {
+		t.Fatal(err)
+	}
+	if got := e.Project(k, o.At).RemainingPercent; got != 100 {
+		t.Fatalf("proven new period not renewed: %v", got)
+	}
+}
+
+func TestMissedAndSlidingResetDoNotLearnDuration(t *testing.T) {
+	s := fixture(t)
+	k := s.Config.Routes[0].Windows[0]
+	n := s.Events[0].At
+	for _, late := range []time.Duration{-30 * time.Second, 20 * time.Minute} {
+		e := engine(t, s)
+		e.State.Observations = nil
+		reset := n.Add(2 * time.Minute)
+		used := 20.0
+		times := []time.Time{n, n.Add(time.Minute), reset.Add(late), reset.Add(late + time.Minute)}
+		for i, at := range times {
+			rs := reset
+			if i >= 2 {
+				rs = reset.Add(5 * time.Hour)
+			}
+			o := Observation{Key: k, At: at, ResetAt: rs, UsedPercent: &used, Source: "fixture", IdentityEvidence: "account-bound"}
+			if err := e.Observe(o); err != nil {
+				t.Fatal(err)
+			}
+		}
+		if p := e.Project(k, times[3]); p.DurationSeconds != 0 {
+			t.Fatalf("unsafe learned duration: %+v", p)
+		}
+	}
+}
+
+func TestQuotaAndResetChangeRanking(t *testing.T) {
+	s := fixture(t)
+	e := engine(t, s)
+	task := *s.Events[0].Task
+	n := s.Events[0].At
+	for i := range e.State.Observations {
+		o := &e.State.Observations[i]
+		if o.Account == "account-b" && o.Window == "weekly" {
+			v := 98.0
+			o.UsedPercent = &v
+		}
+	}
+	if d := e.Decide(task, n, "adaptive", nil); d.Selected != "strong" {
+		t.Fatalf("did not route around weekly bottleneck: %+v", d)
+	}
+	e = engine(t, s)
+	for id, estimate := range task.Estimates {
+		estimate.CostUSD = 1
+		task.Estimates[id] = estimate
+	}
+	for i := range e.State.Observations {
+		o := &e.State.Observations[i]
+		v := 10.0
+		o.UsedPercent = &v
+		if o.Account == "account-b" {
+			o.ResetAt = n.Add(time.Hour)
+		} else {
+			o.ResetAt = n.Add(2 * time.Hour)
+		}
+	}
+	if d := e.Decide(task, n, "adaptive", nil); d.Selected != "economy" {
+		t.Fatalf("did not prefer expiring equal-cost surplus: %+v", d)
+	}
+}

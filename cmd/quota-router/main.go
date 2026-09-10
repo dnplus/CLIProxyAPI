@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -166,7 +167,11 @@ func run() error {
 		}
 		ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 		defer cancel()
-		return service.Run(ctx)
+		err = service.Run(ctx)
+		if errors.Is(err, context.Canceled) {
+			return nil
+		}
+		return err
 	default:
 		return fmt.Errorf("unknown mode")
 	}

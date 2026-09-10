@@ -21,9 +21,31 @@ import (
 	_ "github.com/router-for-me/CLIProxyAPI/v7/internal/translator"
 	"github.com/router-for-me/CLIProxyAPI/v7/sdk/api/handlers"
 	coreauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
+	coreexecutor "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/executor"
+	"github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/usage"
+	sdktranslator "github.com/router-for-me/CLIProxyAPI/v7/sdk/translator"
 )
 
+type observedUsage struct {
+	TaskID string
+	Record usage.Record
+}
+type testUsageObserver chan observedUsage
+
+func (o testUsageObserver) HandleUsage(ctx context.Context, r usage.Record) {
+	id, _ := ctx.Value(taskContextKey{}).(string)
+	if id == "" {
+		return
+	}
+	select {
+	case o <- observedUsage{id, r}:
+	default:
+	}
+}
+
 func TestNativeHTTPJourneyStreamingToolsAffinityAndRestart(t *testing.T) {
+	observed := make(testUsageObserver, 8)
+	usage.RegisterNamedPlugin("adaptive-test", observed)
 	gin.SetMode(gin.TestMode)
 	s := fixture(t)
 	e := engine(t, s)
@@ -58,7 +80,7 @@ func TestNativeHTTPJourneyStreamingToolsAffinityAndRestart(t *testing.T) {
 		if _, err := manager.Register(context.Background(), a); err != nil {
 			t.Fatal(err)
 		}
-		registry.GetGlobalRegistry().RegisterClient(r.AuthID, r.Provider, []*registry.ModelInfo{{ID: r.Model}})
+		registry.GetGlobalRegistry().RegisterClient(r.AuthID, r.Provider, []*registry.ModelInfo{{ID: "fixture-strong"}, {ID: "fixture-economy"}})
 		t.Cleanup(func() { registry.GetGlobalRegistry().UnregisterClient(r.AuthID) })
 	}
 	path := filepath.Join(t.TempDir(), "state.json")
@@ -124,6 +146,14 @@ func TestNativeHTTPJourneyStreamingToolsAffinityAndRestart(t *testing.T) {
 		t.Fatalf("native route/pin/tools failed: %v %s", authHeaders, bodies)
 	}
 	mu.Unlock()
+	select {
+	case event := <-observed:
+		if !strings.HasSuffix(event.TaskID, ":task-1") || event.Record.AuthID != "fixture-account-b" || event.Record.Detail.TotalTokens != 11 || event.Record.Failed {
+			t.Fatalf("uncorrelated usage: %+v", event)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("missing native usage observation")
+	}
 	raw, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
@@ -164,6 +194,16 @@ func TestNativeHTTPJourneyStreamingToolsAffinityAndRestart(t *testing.T) {
 	if status, _ := call("/adaptive/execute", envelope, true); status != 503 {
 		t.Fatal(status)
 	}
+	task.ID = "failed-save"
+	task.Session = "new-session"
+	envelope["task"] = task
+	h.StatePath = filepath.Join(t.TempDir(), "missing", "state.json")
+	if status, body := call("/adaptive/execute", envelope, true); status != 503 || !strings.Contains(body, "reservation_not_durable") {
+		t.Fatalf("save failure: %d %s", status, body)
+	}
+	if !h.fault {
+		t.Fatal("save failure must latch closed")
+	}
 	mu.Lock()
 	defer mu.Unlock()
 	if len(authHeaders) != 2 {
@@ -171,7 +211,7 @@ func TestNativeHTTPJourneyStreamingToolsAffinityAndRestart(t *testing.T) {
 	}
 }
 
-func TestHTTPReservationFailureDoesNotCallUpstream(t *testing.T) {
+func TestHTTPBusyAndFaultRejectImmediately(t *testing.T) {
 	s := fixture(t)
 	e := engine(t, s)
 	h := &HTTP{Engine: e, StatePath: filepath.Join(t.TempDir(), "missing", "state"), ExecuteEnabled: true}
@@ -185,5 +225,41 @@ func TestHTTPReservationFailureDoesNotCallUpstream(t *testing.T) {
 	c, _ = gin.CreateTestContext(httptest.NewRecorder())
 	if h.lock(c) {
 		t.Fatal("fault lock")
+	}
+}
+
+func TestNativeFixedRouteUsesExistingCredentialFailover(t *testing.T) {
+	var seen []string
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		id := r.Header.Get("Authorization")
+		seen = append(seen, id)
+		w.Header().Set("Content-Type", "application/json")
+		if id == "Bearer baseline-a" {
+			w.WriteHeader(429)
+			io.WriteString(w, `{"error":{"message":"fixture quota exceeded"}}`)
+			return
+		}
+		io.WriteString(w, `{"id":"fixture","choices":[{"message":{"role":"assistant","content":"accepted"},"finish_reason":"stop"}]}`)
+	}))
+	defer upstream.Close()
+	cfg := &config.Config{}
+	manager := coreauth.NewManager(nil, &coreauth.FillFirstSelector{}, nil)
+	manager.SetConfig(cfg)
+	manager.SetRetryConfig(0, 0, 2)
+	manager.RegisterExecutor(runtimeexecutor.NewOpenAICompatExecutor("baseline-fixture", cfg))
+	for _, id := range []string{"baseline-a", "baseline-b"} {
+		a := &coreauth.Auth{ID: id, Provider: "baseline-fixture", Status: coreauth.StatusActive, Attributes: map[string]string{"api_key": id, "base_url": upstream.URL}}
+		if _, err := manager.Register(context.Background(), a); err != nil {
+			t.Fatal(err)
+		}
+		registry.GetGlobalRegistry().RegisterClient(id, a.Provider, []*registry.ModelInfo{{ID: "baseline-model"}})
+		t.Cleanup(func() { registry.GetGlobalRegistry().UnregisterClient(id) })
+	}
+	response, err := manager.Execute(context.Background(), []string{"baseline-fixture"}, coreexecutor.Request{Model: "baseline-model", Payload: []byte(`{"model":"baseline-model","messages":[{"role":"user","content":"fixture"}]}`)}, coreexecutor.Options{SourceFormat: sdktranslator.FromString("openai")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Join(seen, ",") != "Bearer baseline-a,Bearer baseline-b" || !bytes.Contains(response.Payload, []byte("accepted")) {
+		t.Fatalf("native failover: %v %s", seen, response.Payload)
 	}
 }

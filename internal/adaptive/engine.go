@@ -173,7 +173,7 @@ func (e *Engine) Project(k Key, now time.Time) Projection {
 		old, stable := history[start-1], history[start-2]
 		first := history[start]
 		delta := o.ResetAt.Sub(old.ResetAt).Seconds()
-		if old.ResetAt.Equal(stable.ResetAt) && old.At.Before(old.ResetAt) && old.ResetAt.Sub(old.At) <= 15*time.Minute && !first.At.Before(old.ResetAt) && first.At.Sub(old.ResetAt) <= 15*time.Minute && delta > 0 && delta <= 400*86400 {
+		if old.ResetAt.Equal(stable.ResetAt) && old.At.Before(old.ResetAt) && old.ResetAt.Sub(old.At) <= 15*time.Minute && !first.At.Before(old.ResetAt) && first.At.Sub(old.ResetAt) <= 15*time.Minute && history[start+1].At.Sub(first.At) <= 15*time.Minute && delta > 0 && delta <= 400*86400 {
 			p.DurationSeconds, p.DurationSource = delta, "observed_rollover"
 		}
 	}
@@ -187,15 +187,20 @@ func (e *Engine) Project(k Key, now time.Time) Projection {
 	}
 	for _, r := range e.State.Reservations {
 		for _, w := range r.Windows {
-			if w.Key == k && w.ResetAt.Equal(o.ResetAt) {
+			cycleStart := o.ResetAt.Add(-time.Duration(p.DurationSeconds * float64(time.Second)))
+			renewed := p.DurationSeconds > 0 && !cycleStart.Before(w.At) && o.At.After(w.At)
+			if w.Key == k && !renewed {
 				p.RemainingPercent -= *w.UsedPercent
 			}
 		}
 	}
 	p.RemainingPercent = math.Max(0, p.RemainingPercent-p.RatePerSecond*now.Sub(o.At).Seconds())
 	if p.RatePerSecond > 0 {
-		t := now.Add(time.Duration(p.RemainingPercent / p.RatePerSecond * float64(time.Second)))
-		p.EstimatedEmptyAt = &t
+		seconds := p.RemainingPercent / p.RatePerSecond
+		if seconds <= 400*86400 {
+			t := now.Add(time.Duration(seconds * float64(time.Second)))
+			p.EstimatedEmptyAt = &t
+		}
 	}
 	return p
 }

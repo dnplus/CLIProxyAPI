@@ -23,6 +23,8 @@ import (
 
 type routeContextKey struct{}
 
+type taskContextKey struct{}
+
 type NativeRouter struct{}
 
 func (NativeRouter) HasModelRouters() bool { return true }
@@ -220,6 +222,7 @@ func (h *HTTP) execute(c *gin.Context) {
 	}
 	ctx := handlers.WithPinnedAuthID(c.Request.Context(), r.AuthID)
 	ctx = context.WithValue(ctx, routeContextKey{}, r)
+	ctx = context.WithValue(ctx, taskContextKey{}, envelope.Task.ID)
 	c.Request = c.Request.WithContext(ctx)
 	c.Request.Body = io.NopCloser(bytes.NewReader(body))
 	c.Request.ContentLength = int64(len(body))
@@ -244,6 +247,7 @@ func (h *HTTP) accounts(c *gin.Context) {
 
 type UsageObserver struct{}
 
-func (UsageObserver) HandleUsage(_ context.Context, r usage.Record) {
-	log.WithFields(log.Fields{"provider": r.Provider, "model": r.Model, "auth_id": r.AuthID, "latency_ms": r.Latency.Milliseconds(), "ttft_ms": r.TTFT.Milliseconds(), "failed": r.Failed, "tokens": r.Detail.TotalTokens, "quota_snapshot": false, "acceptance_verified": false}).Info("adaptive_usage_observed")
+func (UsageObserver) HandleUsage(ctx context.Context, r usage.Record) {
+	taskID, _ := ctx.Value(taskContextKey{}).(string)
+	log.WithFields(log.Fields{"task_id": taskID, "provider": r.Provider, "model": r.Model, "auth_id": r.AuthID, "latency_ms": r.Latency.Milliseconds(), "ttft_ms": r.TTFT.Milliseconds(), "failed": r.Failed, "tokens": r.Detail.TotalTokens, "quota_snapshot": false, "acceptance_verified": false}).Info("adaptive_usage_observed")
 }
