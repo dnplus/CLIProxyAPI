@@ -1,0 +1,455 @@
+{
+  "evidence": "synthetic",
+  "config": {
+    "budget_usd": 4,
+    "max_age_seconds": 600,
+    "routes": [
+      {
+        "id": "strong",
+        "provider": "fixture-api",
+        "account": "account-a",
+        "auth_id": "fixture-account-a",
+        "model": "fixture-strong",
+        "source_kind": "official-api",
+        "capabilities": [
+          "text",
+          "tools"
+        ],
+        "context_tokens": 32000,
+        "windows": [
+          {
+            "provider": "fixture-api",
+            "account": "account-a",
+            "pool": "shared",
+            "window": "short"
+          },
+          {
+            "provider": "fixture-api",
+            "account": "account-a",
+            "pool": "shared",
+            "window": "weekly"
+          }
+        ]
+      },
+      {
+        "id": "economy",
+        "provider": "fixture-api",
+        "account": "account-b",
+        "auth_id": "fixture-account-b",
+        "model": "fixture-economy",
+        "source_kind": "official-api",
+        "capabilities": [
+          "text",
+          "tools"
+        ],
+        "context_tokens": 32000,
+        "windows": [
+          {
+            "provider": "fixture-api",
+            "account": "account-b",
+            "pool": "shared",
+            "window": "short"
+          },
+          {
+            "provider": "fixture-api",
+            "account": "account-b",
+            "pool": "shared",
+            "window": "weekly"
+          }
+        ]
+      }
+    ]
+  },
+  "state": {
+    "observations": [
+      {
+        "provider": "fixture-api",
+        "account": "account-a",
+        "pool": "shared",
+        "window": "short",
+        "at": "2026-09-10T03:58:00Z",
+        "used_percent": 10,
+        "reset_at": "2026-09-10T09:00:00Z",
+        "source": "synthetic-fixture",
+        "identity_evidence": "account-bound"
+      },
+      {
+        "provider": "fixture-api",
+        "account": "account-a",
+        "pool": "shared",
+        "window": "short",
+        "at": "2026-09-10T03:59:00Z",
+        "used_percent": 11,
+        "reset_at": "2026-09-10T09:00:00Z",
+        "source": "synthetic-fixture",
+        "identity_evidence": "account-bound"
+      },
+      {
+        "provider": "fixture-api",
+        "account": "account-a",
+        "pool": "shared",
+        "window": "short",
+        "at": "2026-09-10T04:00:00Z",
+        "used_percent": 12,
+        "reset_at": "2026-09-10T09:00:00Z",
+        "source": "synthetic-fixture",
+        "identity_evidence": "account-bound"
+      },
+      {
+        "provider": "fixture-api",
+        "account": "account-a",
+        "pool": "shared",
+        "window": "weekly",
+        "at": "2026-09-10T03:58:00Z",
+        "used_percent": 10,
+        "reset_at": "2026-09-17T04:00:00Z",
+        "source": "synthetic-fixture",
+        "identity_evidence": "account-bound"
+      },
+      {
+        "provider": "fixture-api",
+        "account": "account-a",
+        "pool": "shared",
+        "window": "weekly",
+        "at": "2026-09-10T03:59:00Z",
+        "used_percent": 11,
+        "reset_at": "2026-09-17T04:00:00Z",
+        "source": "synthetic-fixture",
+        "identity_evidence": "account-bound"
+      },
+      {
+        "provider": "fixture-api",
+        "account": "account-a",
+        "pool": "shared",
+        "window": "weekly",
+        "at": "2026-09-10T04:00:00Z",
+        "used_percent": 12,
+        "reset_at": "2026-09-17T04:00:00Z",
+        "source": "synthetic-fixture",
+        "identity_evidence": "account-bound"
+      },
+      {
+        "provider": "fixture-api",
+        "account": "account-b",
+        "pool": "shared",
+        "window": "short",
+        "at": "2026-09-10T03:58:00Z",
+        "used_percent": 10,
+        "reset_at": "2026-09-10T09:00:00Z",
+        "source": "synthetic-fixture",
+        "identity_evidence": "account-bound"
+      },
+      {
+        "provider": "fixture-api",
+        "account": "account-b",
+        "pool": "shared",
+        "window": "short",
+        "at": "2026-09-10T03:59:00Z",
+        "used_percent": 11,
+        "reset_at": "2026-09-10T09:00:00Z",
+        "source": "synthetic-fixture",
+        "identity_evidence": "account-bound"
+      },
+      {
+        "provider": "fixture-api",
+        "account": "account-b",
+        "pool": "shared",
+        "window": "short",
+        "at": "2026-09-10T04:00:00Z",
+        "used_percent": 12,
+        "reset_at": "2026-09-10T09:00:00Z",
+        "source": "synthetic-fixture",
+        "identity_evidence": "account-bound"
+      },
+      {
+        "provider": "fixture-api",
+        "account": "account-b",
+        "pool": "shared",
+        "window": "weekly",
+        "at": "2026-09-10T03:58:00Z",
+        "used_percent": 10,
+        "reset_at": "2026-09-17T04:00:00Z",
+        "source": "synthetic-fixture",
+        "identity_evidence": "account-bound"
+      },
+      {
+        "provider": "fixture-api",
+        "account": "account-b",
+        "pool": "shared",
+        "window": "weekly",
+        "at": "2026-09-10T03:59:00Z",
+        "used_percent": 11,
+        "reset_at": "2026-09-17T04:00:00Z",
+        "source": "synthetic-fixture",
+        "identity_evidence": "account-bound"
+      },
+      {
+        "provider": "fixture-api",
+        "account": "account-b",
+        "pool": "shared",
+        "window": "weekly",
+        "at": "2026-09-10T04:00:00Z",
+        "used_percent": 12,
+        "reset_at": "2026-09-17T04:00:00Z",
+        "source": "synthetic-fixture",
+        "identity_evidence": "account-bound"
+      }
+    ],
+    "reservations": [],
+    "sessions": {}
+  },
+  "events": [
+    {
+      "at": "2026-09-10T04:00:00Z",
+      "task": {
+        "id": "task-1",
+        "session": "session-1",
+        "capabilities": [
+          "text"
+        ],
+        "context_tokens": 1000,
+        "deadline": "2026-09-10T04:02:00Z",
+        "estimates": {
+          "strong": {
+            "cost_usd": 2,
+            "seconds": 10,
+            "window_percent": {
+              "short": 5,
+              "weekly": 5
+            }
+          },
+          "economy": {
+            "cost_usd": 1,
+            "seconds": 10,
+            "window_percent": {
+              "short": 5,
+              "weekly": 5
+            }
+          }
+        }
+      },
+      "outcomes": {
+        "strong": {
+          "accepted": true,
+          "actual_cost_usd": 2,
+          "seconds": 8
+        },
+        "economy": {
+          "accepted": false,
+          "actual_cost_usd": 1,
+          "seconds": 8
+        }
+      }
+    },
+    {
+      "at": "2026-09-10T04:00:10Z",
+      "task": {
+        "id": "task-2",
+        "session": "session-2",
+        "capabilities": [
+          "text"
+        ],
+        "context_tokens": 1000,
+        "deadline": "2026-09-10T04:02:10Z",
+        "estimates": {
+          "strong": {
+            "cost_usd": 2,
+            "seconds": 10,
+            "window_percent": {
+              "short": 5,
+              "weekly": 5
+            }
+          },
+          "economy": {
+            "cost_usd": 1,
+            "seconds": 10,
+            "window_percent": {
+              "short": 5,
+              "weekly": 5
+            }
+          }
+        }
+      },
+      "outcomes": {
+        "strong": {
+          "accepted": true,
+          "actual_cost_usd": 2,
+          "seconds": 8
+        },
+        "economy": {
+          "accepted": false,
+          "actual_cost_usd": 1,
+          "seconds": 8
+        }
+      }
+    },
+    {
+      "at": "2026-09-10T04:00:20Z",
+      "task": {
+        "id": "task-3",
+        "session": "session-3",
+        "capabilities": [
+          "text"
+        ],
+        "context_tokens": 1000,
+        "deadline": "2026-09-10T04:02:20Z",
+        "estimates": {
+          "strong": {
+            "cost_usd": 2,
+            "seconds": 10,
+            "window_percent": {
+              "short": 5,
+              "weekly": 5
+            }
+          },
+          "economy": {
+            "cost_usd": 1,
+            "seconds": 10,
+            "window_percent": {
+              "short": 5,
+              "weekly": 5
+            }
+          }
+        }
+      },
+      "outcomes": {
+        "strong": {
+          "accepted": true,
+          "actual_cost_usd": 2,
+          "seconds": 8
+        },
+        "economy": {
+          "accepted": false,
+          "actual_cost_usd": 1,
+          "seconds": 8
+        }
+      }
+    },
+    {
+      "at": "2026-09-10T04:00:30Z",
+      "task": {
+        "id": "task-4",
+        "session": "session-4",
+        "capabilities": [
+          "text"
+        ],
+        "context_tokens": 1000,
+        "deadline": "2026-09-10T04:02:30Z",
+        "estimates": {
+          "strong": {
+            "cost_usd": 2,
+            "seconds": 10,
+            "window_percent": {
+              "short": 5,
+              "weekly": 5
+            }
+          },
+          "economy": {
+            "cost_usd": 1,
+            "seconds": 10,
+            "window_percent": {
+              "short": 5,
+              "weekly": 5
+            }
+          }
+        }
+      },
+      "outcomes": {
+        "strong": {
+          "accepted": true,
+          "actual_cost_usd": 2,
+          "seconds": 8
+        },
+        "economy": {
+          "accepted": false,
+          "actual_cost_usd": 1,
+          "seconds": 8
+        }
+      }
+    },
+    {
+      "at": "2026-09-10T04:00:40Z",
+      "task": {
+        "id": "task-5",
+        "session": "session-5",
+        "capabilities": [
+          "text"
+        ],
+        "context_tokens": 1000,
+        "deadline": "2026-09-10T04:02:40Z",
+        "estimates": {
+          "strong": {
+            "cost_usd": 2,
+            "seconds": 10,
+            "window_percent": {
+              "short": 5,
+              "weekly": 5
+            }
+          },
+          "economy": {
+            "cost_usd": 1,
+            "seconds": 10,
+            "window_percent": {
+              "short": 5,
+              "weekly": 5
+            }
+          }
+        }
+      },
+      "outcomes": {
+        "strong": {
+          "accepted": true,
+          "actual_cost_usd": 2,
+          "seconds": 8
+        },
+        "economy": {
+          "accepted": false,
+          "actual_cost_usd": 1,
+          "seconds": 8
+        }
+      }
+    },
+    {
+      "at": "2026-09-10T04:00:50Z",
+      "task": {
+        "id": "task-6",
+        "session": "session-6",
+        "capabilities": [
+          "text"
+        ],
+        "context_tokens": 1000,
+        "deadline": "2026-09-10T04:02:50Z",
+        "estimates": {
+          "strong": {
+            "cost_usd": 2,
+            "seconds": 10,
+            "window_percent": {
+              "short": 5,
+              "weekly": 5
+            }
+          },
+          "economy": {
+            "cost_usd": 1,
+            "seconds": 10,
+            "window_percent": {
+              "short": 5,
+              "weekly": 5
+            }
+          }
+        }
+      },
+      "outcomes": {
+        "strong": {
+          "accepted": true,
+          "actual_cost_usd": 2,
+          "seconds": 8
+        },
+        "economy": {
+          "accepted": false,
+          "actual_cost_usd": 1,
+          "seconds": 8
+        }
+      }
+    }
+  ]
+}

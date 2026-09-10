@@ -1,0 +1,138 @@
+{
+  "observations": [
+    {
+      "provider": "fixture-api",
+      "account": "account-a",
+      "pool": "shared",
+      "window": "short",
+      "at": "2026-09-10T03:58:00Z",
+      "used_percent": 10,
+      "reset_at": "2026-09-10T09:00:00Z",
+      "source": "synthetic-fixture",
+      "identity_evidence": "account-bound"
+    },
+    {
+      "provider": "fixture-api",
+      "account": "account-a",
+      "pool": "shared",
+      "window": "short",
+      "at": "2026-09-10T03:59:00Z",
+      "used_percent": 11,
+      "reset_at": "2026-09-10T09:00:00Z",
+      "source": "synthetic-fixture",
+      "identity_evidence": "account-bound"
+    },
+    {
+      "provider": "fixture-api",
+      "account": "account-a",
+      "pool": "shared",
+      "window": "short",
+      "at": "2026-09-10T04:00:00Z",
+      "used_percent": 12,
+      "reset_at": "2026-09-10T09:00:00Z",
+      "source": "synthetic-fixture",
+      "identity_evidence": "account-bound"
+    },
+    {
+      "provider": "fixture-api",
+      "account": "account-a",
+      "pool": "shared",
+      "window": "weekly",
+      "at": "2026-09-10T03:58:00Z",
+      "used_percent": 10,
+      "reset_at": "2026-09-17T04:00:00Z",
+      "source": "synthetic-fixture",
+      "identity_evidence": "account-bound"
+    },
+    {
+      "provider": "fixture-api",
+      "account": "account-a",
+      "pool": "shared",
+      "window": "weekly",
+      "at": "2026-09-10T03:59:00Z",
+      "used_percent": 11,
+      "reset_at": "2026-09-17T04:00:00Z",
+      "source": "synthetic-fixture",
+      "identity_evidence": "account-bound"
+    },
+    {
+      "provider": "fixture-api",
+      "account": "account-a",
+      "pool": "shared",
+      "window": "weekly",
+      "at": "2026-09-10T04:00:00Z",
+      "used_percent": 12,
+      "reset_at": "2026-09-17T04:00:00Z",
+      "source": "synthetic-fixture",
+      "identity_evidence": "account-bound"
+    },
+    {
+      "provider": "fixture-api",
+      "account": "account-b",
+      "pool": "shared",
+      "window": "short",
+      "at": "2026-09-10T03:58:00Z",
+      "used_percent": 10,
+      "reset_at": "2026-09-10T09:00:00Z",
+      "source": "synthetic-fixture",
+      "identity_evidence": "account-bound"
+    },
+    {
+      "provider": "fixture-api",
+      "account": "account-b",
+      "pool": "shared",
+      "window": "short",
+      "at": "2026-09-10T03:59:00Z",
+      "used_percent": 11,
+      "reset_at": "2026-09-10T09:00:00Z",
+      "source": "synthetic-fixture",
+      "identity_evidence": "account-bound"
+    },
+    {
+      "provider": "fixture-api",
+      "account": "account-b",
+      "pool": "shared",
+      "window": "short",
+      "at": "2026-09-10T04:00:00Z",
+      "used_percent": 12,
+      "reset_at": "2026-09-10T09:00:00Z",
+      "source": "synthetic-fixture",
+      "identity_evidence": "account-bound"
+    },
+    {
+      "provider": "fixture-api",
+      "account": "account-b",
+      "pool": "shared",
+      "window": "weekly",
+      "at": "2026-09-10T03:58:00Z",
+      "used_percent": 10,
+      "reset_at": "2026-09-17T04:00:00Z",
+      "source": "synthetic-fixture",
+      "identity_evidence": "account-bound"
+    },
+    {
+      "provider": "fixture-api",
+      "account": "account-b",
+      "pool": "shared",
+      "window": "weekly",
+      "at": "2026-09-10T03:59:00Z",
+      "used_percent": 11,
+      "reset_at": "2026-09-17T04:00:00Z",
+      "source": "synthetic-fixture",
+      "identity_evidence": "account-bound"
+    },
+    {
+      "provider": "fixture-api",
+      "account": "account-b",
+      "pool": "shared",
+      "window": "weekly",
+      "at": "2026-09-10T04:00:00Z",
+      "used_percent": 12,
+      "reset_at": "2026-09-17T04:00:00Z",
+      "source": "synthetic-fixture",
+      "identity_evidence": "account-bound"
+    }
+  ],
+  "reservations": [],
+  "sessions": {}
+}

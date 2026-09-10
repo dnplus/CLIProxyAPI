@@ -1,0 +1,60 @@
+{
+  "budget_usd": 4,
+  "max_age_seconds": 600,
+  "routes": [
+    {
+      "id": "strong",
+      "provider": "fixture-api",
+      "account": "account-a",
+      "auth_id": "fixture-account-a",
+      "model": "fixture-strong",
+      "source_kind": "official-api",
+      "capabilities": [
+        "text",
+        "tools"
+      ],
+      "context_tokens": 32000,
+      "windows": [
+        {
+          "provider": "fixture-api",
+          "account": "account-a",
+          "pool": "shared",
+          "window": "short"
+        },
+        {
+          "provider": "fixture-api",
+          "account": "account-a",
+          "pool": "shared",
+          "window": "weekly"
+        }
+      ]
+    },
+    {
+      "id": "economy",
+      "provider": "fixture-api",
+      "account": "account-b",
+      "auth_id": "fixture-account-b",
+      "model": "fixture-economy",
+      "source_kind": "official-api",
+      "capabilities": [
+        "text",
+        "tools"
+      ],
+      "context_tokens": 32000,
+      "windows": [
+        {
+          "provider": "fixture-api",
+          "account": "account-b",
+          "pool": "shared",
+          "window": "short"
+        },
+        {
+          "provider": "fixture-api",
+          "account": "account-b",
+          "pool": "shared",
+          "window": "weekly"
+        }
+      ]
+    }
+  ]
+}

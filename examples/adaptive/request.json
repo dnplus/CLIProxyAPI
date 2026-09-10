@@ -1,0 +1,40 @@
+{
+  "task": {
+    "id": "task-1",
+    "session": "session-1",
+    "capabilities": [
+      "text"
+    ],
+    "context_tokens": 1000,
+    "deadline": "2026-09-10T04:02:00Z",
+    "estimates": {
+      "strong": {
+        "cost_usd": 2,
+        "seconds": 10,
+        "window_percent": {
+          "short": 5,
+          "weekly": 5
+        }
+      },
+      "economy": {
+        "cost_usd": 1,
+        "seconds": 10,
+        "window_percent": {
+          "short": 5,
+          "weekly": 5
+        }
+      }
+    }
+  },
+  "request": {
+    "model": "adaptive",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Return 2 + 2."
+      }
+    ],
+    "max_tokens": 100,
+    "stream": false
+  }
+}
